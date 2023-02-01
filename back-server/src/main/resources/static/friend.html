@@ -59,7 +59,7 @@
     var vm = new Vue({
         el: '#app',
         data: {
-            chat_id: 1,
+            chat_id: 6,
             user_id : 1,
 			content: '',
         },
@@ -68,7 +68,7 @@
         },
         methods: {
             findChat: function() {
-                axios.get('/api/chat/'+ 1).then(response => { response.data.data.map(x => showGreeting(x)) });
+                axios.get('/api/user/friend/chat/'+ 6).then(response => { response.data.data.map(x => showGreeting(x)) });
             },
             sendMessage: function() {
                 ws.send("/pub/chat/message", {}, JSON.stringify({chat_id:this.chat_id, user_id:this.user_id, content:this.content}));
@@ -79,7 +79,7 @@
     
     function connect() {
         ws.connect({}, function(frame) {
-            ws.subscribe("/sub/chat/"+ 1, function(message) {
+            ws.subscribe("/sub/chat/"+ 6, function(message) {
             	showGreeting(JSON.parse(message.body))
            	});
         });
