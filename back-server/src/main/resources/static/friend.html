@@ -13,24 +13,21 @@
 	integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
 	crossorigin="anonymous">
 <style>
-[v-cloak] {
-	display: none;
-}
 </style>
 </head>
 <body>
-	<div class="container" id="app" v-cloak>
+	<div class="container" id="app">
 		<div>
-			<h2>방이름</h2>
+			<h2>채팅</h2>
 		</div>
 		<div class="input-group">
 			<div class="input-group-prepend">
 				<label class="input-group-text">내용</label>
 			</div>
-			<input type="text" class="form-control" v-model="content"
-				v-on:keypress.enter="sendMessage">
+			<input type="text" class="form-control" id ="content"
+				onkeyup="if(window.event.keyCode==13){(sendMessage())}">
 			<div class="input-group-append">
-				<button class="btn btn-primary" type="button" @click="sendMessage">보내기</button>
+				<button class="btn btn-primary" type="button" onclick="sendMessage()">보내기</button>
 			</div>
 		</div>
 		<table id="conversation" class="table table-striped">
@@ -55,12 +52,18 @@
 	<script>
     var sock = new SockJS("/api/ws/chat");
 	var ws = Stomp.over(sock);
+	var chat_id = "";
+	var user_id = "";
+
+	
+	function input() {
+		  user_id = prompt("user_id 입력", "");
+		  chat_id = prompt("chat_id 입력", "");
+	}
     // vue.js
-    var vm = new Vue({
+/*     var vm = new Vue({
         el: '#app',
         data: {
-            chat_id: 6,
-            user_id : 1,
 			content: '',
         },
         created() {
@@ -75,11 +78,23 @@
                 this.content = '';
             },
         }
-    });
+    }); */
+    
+    
+    function findChat() {
+    	axios.get('/api/user/friend/chat/'+ chat_id ).then(response => { response.data.data.map(x => showGreeting(x)) });
+    	console.log("findChat" + chat_id);
+    }
+    
+    function sendMessage() {
+    	const content = document.getElementById('content').value;
+    	ws.send("/pub/chat/message", {}, JSON.stringify({chat_id:chat_id, user_id:user_id, content:content}));
+    	document.getElementById('content').value = "";
+    }
     
     function connect() {
         ws.connect({}, function(frame) {
-            ws.subscribe("/sub/chat/"+ 6, function(message) {
+            ws.subscribe("/sub/chat/"+ chat_id, function(message) {
             	showGreeting(JSON.parse(message.body))
            	});
         });
@@ -90,6 +105,8 @@
         $("#greetings").append("<tr><td>"+message.user_nickname + ":" + message.content + "</td></tr>");
     }
     
+    input();
+    findChat();
     connect();
 </script>
 </body>
