@@ -49,7 +49,7 @@
 	<script
 		src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 	<script>
-    var sock = new SockJS("https://i8e201.p.ssafy.io/api/ws/chat");
+    var sock = new SockJS("/api/ws/chat");
 	var ws = Stomp.over(sock);
 	var chat_id = "";
 	var user_id = "";
