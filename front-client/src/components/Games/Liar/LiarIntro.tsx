@@ -3,6 +3,9 @@ import { useState, useEffect } from "react";
 import LiarManual from "./LiarManual";
 import LiarTitle from "./LiarTitle";
 import LiarVote from "./LiarVote";
+import LiarCatch from "./LiarCatch";
+import LiarSuccess from "./LiarSuccess";
+import LiarLose from "./LiarLose";
 import axios from "axios";
 
 function LiarIntro({
@@ -25,9 +28,15 @@ function LiarIntro({
 
   const [isHost, setIshost] = useState<any>(null);
 
-  const [liarnum, setLiarnum] = useState<any>(false); // 라이어의 넘버
+  const [result, setResult] = useState<any>(null);
+
+  const [liarnum, setLiarnum] = useState<any>(null); // 라이어의 넘버
 
   const [mynum, setMyNum] = useState<any>(null); // 내번호
+
+  const [titles, setTitles] = useState<any>(null);
+
+  const [nowtitle, setNowtitle] = useState<any>(null);
 
   // 포차 정보 요청
   const getPochaInfo = async () => {
@@ -49,16 +58,69 @@ function LiarIntro({
     }
   };
 
+  // 라이어 게임 주제 받아오기
+  const getLiarSubject = async () => {
+    let accessToken = localStorage.getItem("accessToken");
+    try {
+      const {
+        data: { data },
+      } = await axios({
+        url: `https://i8e201.p.ssafy.io/api/pocha/game/liar`,
+        headers: {
+          accessToken: accessToken,
+        },
+      });
+      setTitles(data);
+    } catch (error) {
+      console.log("라이어 게임 주제 axios error", error);
+    }
+  };
+
+   // 이번 턴 주제
+   const maintitle = () => {
+    if (titles) {
+      const data = titles[Math.floor(Math.random() * (titles.length - 1))];
+      socket.emit("game_liar_nowtitle", roomName, data);
+    }
+  };
+
   useEffect(() => {
     // 라이어 게임 시그널받기
-    socket.on("game_liar_signal", (signalData: string) => {
+    socket.on("game_liar_signal", (signalData: string, data: any) => {
       getPochaInfo();
+      if(signalData === 'CATCH'){
+        setResult(data);
+      }
       setTimeout(() => {
         setSignal(signalData);
       }, 1000);
     });
     return () => {
       socket.off("game_liar_signal");
+    };
+  }, []);
+
+  useEffect(() => {
+    // 라이어 넘버 받기
+    socket.on("game_liar_number",(data: string) => {
+      if(!liarnum){
+        setLiarnum(data);
+      }
+    });
+    return () => {
+      socket.off("game_liar_number");
+    };
+  }, []);
+
+  useEffect(() => {
+    // 라이어 nowtitle 받기
+    socket.on("game_liar_nowtitle",(data: string) => {
+      if (!nowtitle) {
+        setNowtitle(data)
+      }
+    });
+    return () => {
+      socket.off("game_liar_nowtitle");
     };
   }, []);
 
@@ -98,19 +160,42 @@ function LiarIntro({
     if (mynum === isHost) {
       const totalCount = pochaInfo.totalCount;
       const liarnum = Math.floor(Math.random() * totalCount);
-      setLiarnum(liarnum);
-      setPeopleInfo();
-      socket.emit("game_liar_number", roomName, liarnum);
+      const data = liarnum
+      socket.emit("game_liar_number", roomName, data);
     }
   };
 
   useEffect(() => {
     // console.log(pochaInfo);
     setHostInfo(); // 방장 누군지 > 라이어 뽑기 해줘야함
-    if (mynum === isHost && pochaInfo) {
-      liarnumber();
+    getPochaInfo();
+    setPeopleInfo();
+  }, []);
+
+  useEffect(() => {
+    console.log("%%%%%%%%%    시도하는중");
+    console.log("%%%%%%%%%    pochaInfo", pochaInfo);
+    console.log("%%%%%%%%%    mynum", mynum);
+    console.log("%%%%%%%%%    isHost", isHost);
+    console.log("%%%%%%%%%    liarnum", liarnum);
+    
+    if ((mynum === isHost) && (pochaInfo)) {
+      if(!liarnum){
+        console.log("라이어 넘버정하는거 시작");
+        liarnumber();
+        getLiarSubject();
+      }
     }
   }, [pochaInfo]);
+
+  useEffect(() => {
+    maintitle();
+  },[titles]);
+
+  console.log("isHost",isHost)
+  console.log("titles",titles)
+  console.log("nowtitle",nowtitle)
+  console.log("liarnum",liarnum)
 
   return (
     <>
@@ -121,6 +206,7 @@ function LiarIntro({
           pochaUsers={pochaUsers}
           pochaInfo={pochaInfo}
           liarnum={liarnum}
+          nowtitle={nowtitle}
         />
       ) : null}
       {signal === "MANUAL" ? (
@@ -133,6 +219,28 @@ function LiarIntro({
           pochaUsers={pochaUsers}
           pochaInfo={pochaInfo}
           liarnum={liarnum}
+        />
+      ) : null}
+      {signal === "CATCH" ? (
+        <LiarCatch
+          socket={socket}
+          pochaId={pochaId}
+          result={result}
+          liarnum={liarnum}
+        />
+      ) : null}
+      {signal === "SUCCESS" ? (
+        <LiarSuccess
+          socket={socket}
+          pochaId={pochaId}
+          result={result}
+        />
+      ) : null}
+      {signal === "LOSE" ? (
+        <LiarLose
+          socket={socket}
+          pochaId={pochaId}
+          result={result}
         />
       ) : null}
       {signal === "INTRO" ? (

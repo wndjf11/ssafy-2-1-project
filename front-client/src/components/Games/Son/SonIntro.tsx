@@ -85,7 +85,7 @@ function SonIntro({
         <SonPlay socket={socket} pochaId={pochaId} pochaUsers={pochaUsers} pochaInfo={pochaInfo} />
       ) : null}
       {signal === "RESULT" ? <SonResult socket={socket} pochaId={pochaId} resultData={resultData}/> : null}
-      {signal === "MENUAL" ? (
+      {signal === "MANUAL" ? (
         <SonMenual socket={socket} pochaId={pochaId} pochaUsers={pochaUsers} />
       ) : null}
       {signal === "INTRO" ? (
@@ -118,7 +118,7 @@ function SonIntro({
                 onClick={onClickSignal}
                 type="button"
                 className={`${styles.retry}`}
-                value="MENUAL"
+                value="MANUAL"
               />
               <input
                 onClick={onClickSignal}

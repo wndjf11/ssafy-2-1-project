@@ -1,20 +1,26 @@
 import styles from "./LiarCatch.module.css";
 
-function LiarManual({
+function LiarCatch({
   socket,
   pochaId,
-  pochaUsers,
+  result,
+  liarnum,
 }: {
   socket: any;
   pochaId: string;
-  pochaUsers: any;
+  result: any;
+  liarnum: number;
 }): React.ReactElement {
   const roomName = pochaId;
 
   const onClickClose = () => {
-    const signalData = "INTRO";
-    // 선택창으로 돌아가기
-    socket.emit("game_liar_signal", roomName, signalData);
+    if ((result.length === 1)&&(result[0] === liarnum)){
+      const signalData = "SUCCESS";
+      socket.emit("game_liar_signal", roomName, signalData, result);
+    }else{
+      const signalData = "LOSE";
+      socket.emit("game_liar_signal", roomName, signalData, result);
+    }
   };
 
   return (
@@ -35,4 +41,4 @@ function LiarManual({
   );
 }
 
-export default LiarManual;
+export default LiarCatch;

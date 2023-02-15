@@ -3,11 +3,11 @@ import styles from "./LiarSuccess.module.css";
 function LiarSuccess({
   socket,
   pochaId,
-  pochaUsers,
+  result,
 }: {
   socket: any;
   pochaId: string;
-  pochaUsers: any;
+  result: any;
 }): React.ReactElement {
   const roomName = pochaId;
 
@@ -29,7 +29,7 @@ function LiarSuccess({
           className={`${styles.img1}`}
           alt="liarcatch"
         />
-        <div className={`${styles.box2} ${styles.layout2}`} id="liar"></div>
+        <div className={`${styles.box2} ${styles.layout2}`} id="liar">{result[0]}</div>
         <div className={`${styles.layout4}`}>
           <input type="button" onClick={onClickClose} className={`${styles.retry}`} value="EXIT" />
           <input type="button" onClick={onClickRetry} className={`${styles.retry}`} value="RETRY" />     
