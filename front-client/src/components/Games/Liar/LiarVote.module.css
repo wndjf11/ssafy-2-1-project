@@ -144,7 +144,7 @@ input.txt {
   color: #FFFFFF;
   display: flex;
   justify-content: center;
-  margin-top: 100px;
+  margin-top: 90px;
 }
 
 .layout {
@@ -197,9 +197,6 @@ input.txt {
 }
 
 .layout6 {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   margin-top: 80px;
 }
 
@@ -263,4 +260,19 @@ input.txt {
   font-size : 16px; 
   color : #3b3b3b; 
   float:right;
+}
+
+.subjectsArrow {
+  display: inline-block;
+  width: 1rem;
+  margin: 0 0.5rem;
+  display: none;
+  transform: rotate(270deg);
+}
+
+.subjects {
+  font-size: 1.2rem;
+  text-align: start;
+  margin: 1.2rem auto;
+  cursor: pointer;
 }

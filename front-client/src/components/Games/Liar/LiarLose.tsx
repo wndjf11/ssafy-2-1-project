@@ -3,11 +3,11 @@ import styles from "./LiarLose.module.css";
 function LiarLose({
   socket,
   pochaId,
-  pochaUsers,
+  result,
 }: {
   socket: any;
   pochaId: string;
-  pochaUsers: any;
+  result: any;
 }): React.ReactElement {
   const roomName = pochaId;
 
@@ -30,7 +30,9 @@ function LiarLose({
           alt="liarcatch"
         />
         <div className={`${styles.layout2}`}>
-        <div className={`${styles.text2}`} id="liar"></div>
+        <div className={`${styles.text2}`} id="liar">{result.map((data: any) => {
+          return <span>{`${data} `}</span>
+        })}</div>
         <span className={`${styles.text1}`}>
           은(는) 라이어가 아니었습니다.<br/>
         </span>
